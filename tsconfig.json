@@ -1,0 +1,44 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "rootDir": "./src",
+    "baseUrl": "src",
+    
+    "module": "commonjs",
+    "target": "es5",
+    "moduleResolution": "node",
+
+    "strict": true,
+    "allowJs": false,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictFunctionTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "suppressImplicitAnyIndexErrors": true,
+
+    "typeRoots": [
+      "./src/@types",
+    ],
+    "lib": [
+      "scripthost",
+      "es2017",
+      "dom"
+    ],
+    "paths" : {
+      "src/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
+  ]
+}

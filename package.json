@@ -1,0 +1,33 @@
+{
+  "name": "circuit-breaker-monad",
+  "version": "0.0.1",
+  "description": "CIrcuit Breaker pattern as a monad",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest -u"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YBogomolov/circuit-breaker-monad.git"
+  },
+  "keywords": [
+    "circuit",
+    "breaker",
+    "typescript",
+    "monad"
+  ],
+  "author": "Yuriy Bogomolov <yuriy.bogomolov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YBogomolov/circuit-breaker-monad/issues"
+  },
+  "homepage": "https://github.com/YBogomolov/circuit-breaker-monad#readme",
+  "dependencies": {
+    "fp-ts": "^1.10.0",
+    "typescript": "^3.1.6"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "tslint-sonarts": "^1.8.0"
+  }
+}
