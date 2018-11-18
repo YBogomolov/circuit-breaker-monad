@@ -91,4 +91,5 @@ export type BreakerRequest<T> = Lazy<Promise<T>>;
 /**
  * Enhanced request handler
  */
-export type EnhancedFetch<T> = (request: BreakerRequest<T>) => TaskEither<BreakerError, T>;
+export type EnhancedFetch<T> =
+  (request: BreakerRequest<T>, ref?: IORef<BreakerStatus>) => [IORef<BreakerStatus>, TaskEither<BreakerError, T>];

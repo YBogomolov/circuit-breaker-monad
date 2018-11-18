@@ -1,5 +1,6 @@
 // Adapted implementation of https://hackage.haskell.org/package/glue-core-0.4.2/docs/src/Glue-CircuitBreaker.html
 
+import { constFalse, constTrue } from 'fp-ts/lib/function';
 import { io, IO } from 'fp-ts/lib/IO';
 import { IORef } from 'fp-ts/lib/IORef';
 import { Reader } from 'fp-ts/lib/Reader';
@@ -20,8 +21,7 @@ import {
 
 export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<T>>(
   (opts: BreakerOptions) => {
-    const failingCall = (): TaskEither<BreakerError, T> =>
-      fromLeft(new BreakerError(opts.breakerDescription));
+    const failingCall = (): TaskEither<BreakerError, T> => fromLeft(new BreakerError(opts.breakerDescription));
 
     const incErrors = (ref: IORef<BreakerStatus>): IO<void> => getCurrentTime().read.chain(
       (currentTime) => ref.read.chain(
@@ -30,7 +30,7 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
             case 'Closed': {
               const errorCount = status.errorCount;
               if (errorCount >= opts.maxBreakerFailures) {
-                return ref.write(breakerOpen(currentTime + (opts.resetTimeoutSecs)));
+                return ref.write(breakerOpen(currentTime + (opts.resetTimeoutSecs * 1000)));
               } else {
                 return ref.write(breakerClosed(errorCount + 1));
               }
@@ -45,17 +45,12 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
 
     const callIfClosed = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
       tryCatch(request, (reason) => {
-        incErrors(ref);
+        incErrors(ref).run();
         return new BreakerError(String(reason));
       });
 
     const canaryCall = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
-      callIfClosed(request, ref).chain(
-        (result: T) => {
-          ref.write(breakerClosed(0));
-          return fromIO(io.of(result));
-        },
-      );
+      callIfClosed(request, ref).chain((result: T) => fromIO(ref.write(breakerClosed(0)).chain(() => io.of(result))));
 
     const callIfOpen = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
       fromIO<BreakerError, boolean>(getCurrentTime().read.chain(
@@ -63,15 +58,12 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
           (status) => {
             switch (status.tag) {
               case 'Closed':
-                ref.write(status);
-                return io.of(false);
+                return ref.write(status).map(constFalse);
               case 'Open': {
                 if (currentTime > status.timeOpened) {
-                  ref.write(breakerOpen(currentTime + opts.resetTimeoutSecs));
-                  return io.of(true);
+                  return ref.write(breakerOpen(currentTime + (opts.resetTimeoutSecs * 1000))).map(constTrue);
                 }
-                ref.write(status);
-                return io.of(false);
+                return ref.write(status).map(constFalse);
               }
             }
           },
@@ -80,8 +72,11 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
         (canaryRequest) => canaryRequest ? canaryCall(request, ref) : failingCall(),
       );
 
-    const breakerService = (ref: IORef<BreakerStatus>) => (request: BreakerRequest<T>): TaskEither<BreakerError, T> =>
-      fromIO<BreakerError, BreakerStatus>(ref.read).chain(
+    const breakerService = (
+      request: BreakerRequest<T>,
+      ref: IORef<BreakerStatus> = new IORef(breakerClosed(0)),
+    ): [IORef<BreakerStatus>, TaskEither<BreakerError, T>] =>
+      [ref, fromIO<BreakerError, BreakerStatus>(ref.read).chain(
         (status: BreakerStatus) => {
           switch (status.tag) {
             case 'Closed':
@@ -90,8 +85,8 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
               return callIfOpen(request, ref);
           }
         },
-      );
+      )];
 
-    return breakerService(new IORef(breakerClosed(0)));
+    return breakerService;
   },
 );
