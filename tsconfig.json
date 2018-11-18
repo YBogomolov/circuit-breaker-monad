@@ -21,6 +21,7 @@
     "strictFunctionTypes": true,
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
+    "declaration": true,
 
     "typeRoots": [
       "./src/@types",
@@ -32,10 +33,10 @@
     ]
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*.ts"
   ],
   "exclude": [
       "node_modules",
-      "**/*.spec.ts"
+      "**/*.test.ts"
   ]
 }

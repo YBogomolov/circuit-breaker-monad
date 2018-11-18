@@ -86,9 +86,9 @@ export type BreakerState = Array<IORef<BreakerStatus>>;
 /**
  * Request with all parameters pre-bound
  */
-export type Request<T> = Lazy<Promise<T>>;
+export type BreakerRequest<T> = Lazy<Promise<T>>;
 
 /**
  * Enhanced request handler
  */
-export type Enhanced<T> = (request: Request<T>) => TaskEither<BreakerError, T>;
+export type EnhancedFetch<T> = (request: BreakerRequest<T>) => TaskEither<BreakerError, T>;

@@ -4,7 +4,9 @@
   "description": "CIrcuit Breaker pattern as a monad",
   "main": "index.js",
   "scripts": {
-    "test": "jest -u"
+    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "build": "tsc",
+    "postinstall": "build"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,12 @@
     "typescript": "^3.1.6"
   },
   "devDependencies": {
+    "@types/fetch-mock": "^6.0.4",
+    "@types/mocha": "^5.2.5",
+    "fetch-mock": "^7.2.5",
+    "mocha": "^5.2.0",
+    "node-fetch": "^2.3.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-sonarts": "^1.8.0"
   }
