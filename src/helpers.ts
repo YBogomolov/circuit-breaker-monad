@@ -3,19 +3,8 @@ import { IORef } from 'fp-ts/lib/IORef';
 import {
   BreakerClosed,
   BreakerOpen,
-  BreakerOptions,
-  BreakerState,
   BreakerStatus,
 } from './types';
-
-/**
- * Default circuit breaker options
- */
-export const defaultBreakerOptions: BreakerOptions = {
-  maxBreakerFailures: 3,
-  resetTimeoutSecs: 60,
-  breakerDescription: 'Circuit breaker is closed',
-};
 
 /**
  * Creates a new instance of BreakerClosed class
@@ -40,28 +29,6 @@ export const isStatusOpen = (status: BreakerStatus): status is BreakerOpen => st
  * @param status Circuit breaker status
  */
 export const isStatusClosed = (status: BreakerStatus): status is BreakerClosed => status.tag === 'Closed';
-
-/**
- * Checks whether circuit breaker state is open
- * @param state Circuit breaker state
- */
-export const isBreakerOpen = (state: BreakerState): IORef<boolean> => {
-  return state.reduce((acc, s) => {
-    acc.write(acc.read.run() || s.read.map(isStatusOpen).run());
-    return acc;
-  }, new IORef(true));
-};
-
-/**
- * Checks whether circuit breaker state is closed
- * @param state Circuit breaker state
- */
-export const isBreakerClosed = (state: BreakerState): IORef<boolean> => {
-  return state.reduce((acc, s) => {
-    acc.write(acc.read.run() && s.read.map(isStatusClosed).run());
-    return acc;
-  }, new IORef(true));
-};
 
 /**
  * Gets current time as UTC timestamp

@@ -1,6 +1,6 @@
 // Adapted implementation of https://hackage.haskell.org/package/glue-core-0.4.2/docs/src/Glue-CircuitBreaker.html
 
-import { constFalse, constTrue } from 'fp-ts/lib/function';
+import { constFalse, constTrue, Lazy } from 'fp-ts/lib/function';
 import { io, IO } from 'fp-ts/lib/IO';
 import { IORef } from 'fp-ts/lib/IORef';
 import { Reader } from 'fp-ts/lib/Reader';
@@ -12,16 +12,23 @@ import {
   getCurrentTime,
 } from './helpers';
 import {
-  BreakerError,
   BreakerOptions,
-  BreakerRequest,
   BreakerStatus,
   EnhancedFetch,
 } from './types';
 
+/**
+ * Default circuit breaker options
+ */
+export const defaultBreakerOptions: BreakerOptions = {
+  maxBreakerFailures: 3,
+  resetTimeoutSecs: 60,
+  breakerDescription: 'Circuit breaker is closed',
+};
+
 export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<T>>(
   (opts: BreakerOptions) => {
-    const failingCall = (): TaskEither<BreakerError, T> => fromLeft(new BreakerError(opts.breakerDescription));
+    const failingCall = (): TaskEither<Error, T> => fromLeft(new Error(opts.breakerDescription));
 
     const incErrors = (ref: IORef<BreakerStatus>): IO<void> => getCurrentTime().read.chain(
       (currentTime) => ref.read.chain(
@@ -43,17 +50,17 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
       ),
     );
 
-    const callIfClosed = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
+    const callIfClosed = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
       tryCatch(request, (reason) => {
         incErrors(ref).run();
-        return new BreakerError(String(reason));
+        return new Error(String(reason));
       });
 
-    const canaryCall = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
+    const canaryCall = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
       callIfClosed(request, ref).chain((result: T) => fromIO(ref.write(breakerClosed(0)).chain(() => io.of(result))));
 
-    const callIfOpen = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
-      fromIO<BreakerError, boolean>(getCurrentTime().read.chain(
+    const callIfOpen = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
+      fromIO<Error, boolean>(getCurrentTime().read.chain(
         (currentTime) => ref.read.chain(
           (status) => {
             switch (status.tag) {
@@ -73,10 +80,10 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
       );
 
     const breakerService = (
-      request: BreakerRequest<T>,
+      request: Lazy<Promise<T>>,
       ref: IORef<BreakerStatus> = new IORef(breakerClosed(0)),
-    ): [IORef<BreakerStatus>, TaskEither<BreakerError, T>] =>
-      [ref, fromIO<BreakerError, BreakerStatus>(ref.read).chain(
+    ): [IORef<BreakerStatus>, TaskEither<Error, T>] =>
+      [ref, fromIO<Error, BreakerStatus>(ref.read).chain(
         (status: BreakerStatus) => {
           switch (status.tag) {
             case 'Closed':

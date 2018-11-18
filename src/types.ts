@@ -37,15 +37,6 @@ export interface BreakerOptions {
 }
 
 /**
- * Circuit breaker exception: call to a underlying resource has failed
- *
- * @export
- * @class BreakerException
- * @extends {Error}
- */
-export class BreakerError extends Error {}
-
-/**
  * Closed circuit breaker status (normal operation mode)
  *
  * @export
@@ -76,20 +67,7 @@ export class BreakerOpen {
 export type BreakerStatus = BreakerClosed | BreakerOpen;
 
 /**
- * History state of circuit breaker
- *
- * @export
- * @type BreakerState
- */
-export type BreakerState = Array<IORef<BreakerStatus>>;
-
-/**
- * Request with all parameters pre-bound
- */
-export type BreakerRequest<T> = Lazy<Promise<T>>;
-
-/**
  * Enhanced request handler
  */
 export type EnhancedFetch<T> =
-  (request: BreakerRequest<T>, ref?: IORef<BreakerStatus>) => [IORef<BreakerStatus>, TaskEither<BreakerError, T>];
+  (request: Lazy<Promise<T>>, ref?: IORef<BreakerStatus>) => [IORef<BreakerStatus>, TaskEither<Error, T>];

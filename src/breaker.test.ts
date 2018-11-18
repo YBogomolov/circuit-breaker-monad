@@ -4,8 +4,7 @@ import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
 
 import { delay } from 'fp-ts/lib/Task';
-import { defaultBreakerOptions } from './helpers';
-import { circuitBreaker } from './index';
+import { circuitBreaker, defaultBreakerOptions } from './index';
 
 const ADDRESS = 'http://example.com';
 
