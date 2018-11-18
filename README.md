@@ -1,6 +1,6 @@
 # Circuit Breaker pattern as a monad
 
-[![npm](https://img.shields.io/npm/v/migro.svg)](https://www.npmjs.com/package/circuit-breaker-monad)
+[![npm](https://img.shields.io/npm/v/circuit-breaker-monad.svg)](https://www.npmjs.com/package/circuit-breaker-monad)
 
 TypeScript implementation of Circuit Breaker pattern. Adaptation of [Glue.CircuitBreaker](https://hackage.haskell.org/package/glue-core-0.4.2/docs/Glue-CircuitBreaker.html) module from Haskell.
 
