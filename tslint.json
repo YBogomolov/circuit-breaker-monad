@@ -137,6 +137,7 @@
     ],
     "no-var-requires": false,
     "no-submodule-imports": false,
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
+    "interface-name": false
   }
 }

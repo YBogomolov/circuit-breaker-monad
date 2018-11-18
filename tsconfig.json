@@ -29,10 +29,7 @@
       "scripthost",
       "es2017",
       "dom"
-    ],
-    "paths" : {
-      "src/*": ["./src/*"]
-    }
+    ]
   },
   "include": [
     "./src/**/*"
