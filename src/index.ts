@@ -3,7 +3,7 @@
 import { io, IO } from 'fp-ts/lib/IO';
 import { IORef } from 'fp-ts/lib/IORef';
 import { Reader } from 'fp-ts/lib/Reader';
-import { fromIO, TaskEither, tryCatch } from 'fp-ts/lib/TaskEither';
+import { fromIO, fromLeft, TaskEither, tryCatch } from 'fp-ts/lib/TaskEither';
 
 import {
   breakerClosed,
@@ -13,16 +13,15 @@ import {
 import {
   BreakerError,
   BreakerOptions,
+  BreakerRequest,
   BreakerStatus,
-  Enhanced,
-  Request,
+  EnhancedFetch,
 } from './types';
 
-export const circuitBreaker = <T>() => new Reader<BreakerOptions, Enhanced<T>>(
+export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<T>>(
   (opts: BreakerOptions) => {
-    const failingCall = (): TaskEither<BreakerError, T> => {
-      throw new BreakerError(opts.breakerDescription);
-    };
+    const failingCall = (): TaskEither<BreakerError, T> =>
+      fromLeft(new BreakerError(opts.breakerDescription));
 
     const incErrors = (ref: IORef<BreakerStatus>): IO<void> => getCurrentTime().read.chain(
       (currentTime) => ref.read.chain(
@@ -44,13 +43,13 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, Enhanced<T>>(
       ),
     );
 
-    const callIfClosed = (request: Request<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
+    const callIfClosed = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
       tryCatch(request, (reason) => {
         incErrors(ref);
-        throw new BreakerError(String(reason));
+        return new BreakerError(String(reason));
       });
 
-    const canaryCall = (request: Request<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
+    const canaryCall = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
       callIfClosed(request, ref).chain(
         (result: T) => {
           ref.write(breakerClosed(0));
@@ -58,7 +57,7 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, Enhanced<T>>(
         },
       );
 
-    const callIfOpen = (request: Request<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
+    const callIfOpen = (request: BreakerRequest<T>, ref: IORef<BreakerStatus>): TaskEither<BreakerError, T> =>
       fromIO<BreakerError, boolean>(getCurrentTime().read.chain(
         (currentTime) => ref.read.chain(
           (status) => {
@@ -81,7 +80,7 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, Enhanced<T>>(
         (canaryRequest) => canaryRequest ? canaryCall(request, ref) : failingCall(),
       );
 
-    const breakerService = (ref: IORef<BreakerStatus>) => (request: Request<T>): TaskEither<BreakerError, T> =>
+    const breakerService = (ref: IORef<BreakerStatus>) => (request: BreakerRequest<T>): TaskEither<BreakerError, T> =>
       fromIO<BreakerError, BreakerStatus>(ref.read).chain(
         (status: BreakerStatus) => {
           switch (status.tag) {
