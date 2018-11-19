@@ -9,9 +9,7 @@
   "typings": "lib/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.test.ts",
-    "build": "tsc",
-    "postinstall": "npm run build",
-    "prepublish": "npm run build"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
