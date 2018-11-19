@@ -69,3 +69,4 @@ typings/
 .vscode/
 dist/
 trash/
+lib/
