@@ -16,7 +16,7 @@ npm install circuit-breaker-monad
 Then import the main `circuitBreaker` function:
 
 ```ts
-import { circuitBreaker } from 'circuit-breaker-monad';
+import { circuitBreaker } from 'circuit-breaker-monad/lib';
 ```
 
 This function returns a `Reader`, which, given the corresponding `BreakerOptions`, creates an enhanced fetcher – a function which takes any `Lazy<Promise<T>>` instance and returns a tuple of `IORef<BreakerStatus>` and `TaskEither<Error, T>`. The first element of this tuple is current circuit breaker status, implemented via `IORef` (mutable reference in the IO monad), and the second element of the tuple is ready-to-be-called `TaskEither`.
@@ -24,7 +24,7 @@ This function returns a `Reader`, which, given the corresponding `BreakerOptions
 Let's look at the usage example:
 
 ```ts
-import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad';
+import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
 
 const fetcher = circuitBreaker<Response>().run(defaultBreakerOptions);
 

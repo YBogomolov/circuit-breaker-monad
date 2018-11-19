@@ -1,6 +1,6 @@
 {
   "name": "circuit-breaker-monad",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Circuit Breaker pattern as a monad",
   "files": [
     "lib"
@@ -28,8 +28,7 @@
   },
   "homepage": "https://github.com/YBogomolov/circuit-breaker-monad#readme",
   "dependencies": {
-    "fp-ts": "^1.10.0",
-    "typescript": "^3.1.6"
+    "fp-ts": "^1.10.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -41,6 +40,7 @@
     "node-fetch": "^2.3.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "tslint-sonarts": "^1.8.0"
+    "tslint-sonarts": "^1.8.0",
+    "typescript": "^3.1.6"
   }
 }
