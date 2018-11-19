@@ -1,6 +1,6 @@
 {
   "name": "circuit-breaker-monad",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Circuit Breaker pattern as a monad",
   "main": "index.js",
   "scripts": {
