@@ -2,11 +2,16 @@
   "name": "circuit-breaker-monad",
   "version": "0.1.2",
   "description": "Circuit Breaker pattern as a monad",
-  "main": "index.js",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.test.ts",
     "build": "tsc",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
