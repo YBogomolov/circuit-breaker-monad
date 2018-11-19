@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.test.ts",
     "build": "tsc",
-    "postinstall": "build"
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
