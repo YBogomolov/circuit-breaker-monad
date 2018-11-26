@@ -31,9 +31,14 @@ const fetcher = circuitBreaker<Response>().run(defaultBreakerOptions);
 const main = async () => {
   const promise = () => fetch('http://my-domain.com/my-data.json').then(res => res.json());
   const [ref, result] = fetcher(promise);
-  const myData = await result.run();
+  const response = await result.run();
+  response.fold(
+    (e: Error) => { ... },
+    (myData: TMyJsonData) => { ... }
+  );
   // ref :: BreakerClosed { errorCount: 0 }
   // result :: TaskEither<Error, Response>
+  // response :: Either<Error, Response>
   // myData :: TMyJsonData
 };
 ```

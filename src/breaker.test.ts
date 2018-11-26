@@ -26,10 +26,25 @@ describe('Circuit Breaker', () => {
 
   it('should handle promise rejection', (done) => {
     const fetcher = circuitBreaker<string>().run(defaultBreakerOptions);
-    const [, result] = fetcher(() => Promise.reject(new Error('not ok')));
+    const [, result] = fetcher(() => Promise.reject('not ok'));
     result.run().then(
       (res) => res.fold(
         (_) => done(),
+        (s) => done(`should not resolve: ${s}`),
+      ),
+    );
+  });
+
+  it('should handle promise rejection with Error', (done) => {
+    const error = new Error('not ok');
+    const fetcher = circuitBreaker<string>().run(defaultBreakerOptions);
+    const [, result] = fetcher(() => Promise.reject(error));
+    result.run().then(
+      (res) => res.fold(
+        (l: Error) => {
+          expect(l).to.equal(error);
+          done();
+        },
         (s) => done(`should not resolve: ${s}`),
       ),
     );
