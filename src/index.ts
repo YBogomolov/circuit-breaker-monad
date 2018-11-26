@@ -53,7 +53,7 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
     const callIfClosed = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
       tryCatch(request, (reason) => {
         incErrors(ref).run();
-        return new Error(String(reason));
+        return (reason instanceof Error) ? reason : new Error(String(reason));
       });
 
     const canaryCall = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
