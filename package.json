@@ -1,6 +1,6 @@
 {
   "name": "circuit-breaker-monad",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Circuit Breaker pattern as a monad",
   "files": [
     "lib"
