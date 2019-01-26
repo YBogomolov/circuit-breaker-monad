@@ -1,6 +1,6 @@
 {
   "name": "circuit-breaker-monad",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Circuit Breaker pattern as a monad",
   "files": [
     "lib"
@@ -27,7 +27,7 @@
     "url": "https://github.com/YBogomolov/circuit-breaker-monad/issues"
   },
   "homepage": "https://github.com/YBogomolov/circuit-breaker-monad#readme",
-  "dependencies": {
+  "peerDependencies": {
     "fp-ts": "^1.10.0"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
     "fetch-mock": "^7.2.5",
+    "fp-ts": "^1.10.0",
     "mocha": "^5.2.0",
     "node-fetch": "^2.3.0",
     "ts-node": "^7.0.1",
