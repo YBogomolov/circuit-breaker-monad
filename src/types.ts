@@ -44,7 +44,7 @@ export interface BreakerOptions {
  */
 export class BreakerClosed {
   public readonly tag = 'Closed';
-  constructor(public readonly errorCount: number) {}
+  constructor(public readonly errorCount: number) { }
 }
 
 /**
@@ -55,19 +55,19 @@ export class BreakerClosed {
  */
 export class BreakerOpen {
   public readonly tag = 'Open';
-  constructor(public readonly timeOpened: number) {}
+  constructor(public readonly openEndTime: number) { }
 }
 
 /**
  * Sum type corresponding to possible circuit breaker statuses: open or closed
  *
  * @export
- * @type BreakerStatus
+ * @type BreakerState
  */
-export type BreakerStatus = BreakerClosed | BreakerOpen;
+export type BreakerState = BreakerClosed | BreakerOpen;
 
 /**
  * Enhanced request handler
  */
 export type EnhancedFetch<T> =
-  (request: Lazy<Promise<T>>, ref?: IORef<BreakerStatus>) => [IORef<BreakerStatus>, TaskEither<Error, T>];
+  (request: Lazy<Promise<T>>, ref?: IORef<BreakerState>) => [IORef<BreakerState>, TaskEither<Error, T>];

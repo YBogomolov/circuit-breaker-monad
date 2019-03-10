@@ -6,16 +6,8 @@ import { IORef } from 'fp-ts/lib/IORef';
 import { Reader } from 'fp-ts/lib/Reader';
 import { fromIO, fromLeft, TaskEither, tryCatch } from 'fp-ts/lib/TaskEither';
 
-import {
-  breakerClosed,
-  breakerOpen,
-  getCurrentTime,
-} from './helpers';
-import {
-  BreakerOptions,
-  BreakerStatus,
-  EnhancedFetch,
-} from './types';
+import { breakerClosed, breakerOpen, getCurrentTime } from './helpers';
+import { BreakerOptions, BreakerState, EnhancedFetch } from './types';
 
 /**
  * Default circuit breaker options
@@ -23,19 +15,19 @@ import {
 export const defaultBreakerOptions: BreakerOptions = {
   maxBreakerFailures: 3,
   resetTimeoutSecs: 60,
-  breakerDescription: 'Circuit breaker is closed',
+  breakerDescription: 'Circuit breaker is open',
 };
 
 export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<T>>(
   (opts: BreakerOptions) => {
     const failingCall = (): TaskEither<Error, T> => fromLeft(new Error(opts.breakerDescription));
 
-    const incErrors = (ref: IORef<BreakerStatus>): IO<void> => getCurrentTime().read.chain(
+    const incErrors = (ref: IORef<BreakerState>): IO<void> => getCurrentTime().read.chain(
       (currentTime) => ref.read.chain(
-        (status) => {
-          switch (status.tag) {
+        (state) => {
+          switch (state.tag) {
             case 'Closed': {
-              const errorCount = status.errorCount;
+              const errorCount = state.errorCount;
               if (errorCount >= opts.maxBreakerFailures) {
                 return ref.write(breakerOpen(currentTime + (opts.resetTimeoutSecs * 1000)));
               } else {
@@ -50,27 +42,25 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
       ),
     );
 
-    const callIfClosed = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
-      tryCatch(request, (reason) => {
-        incErrors(ref).run();
-        return (reason instanceof Error) ? reason : new Error(String(reason));
-      });
+    const callIfClosed = (request: Lazy<Promise<T>>, ref: IORef<BreakerState>): TaskEither<Error, T> =>
+      tryCatch(request, (reason) =>
+        incErrors(ref).map(() => (reason instanceof Error) ? reason : new Error(String(reason))).run());
 
-    const canaryCall = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
+    const canaryCall = (request: Lazy<Promise<T>>, ref: IORef<BreakerState>): TaskEither<Error, T> =>
       callIfClosed(request, ref).chain((result: T) => fromIO(ref.write(breakerClosed(0)).chain(() => io.of(result))));
 
-    const callIfOpen = (request: Lazy<Promise<T>>, ref: IORef<BreakerStatus>): TaskEither<Error, T> =>
+    const callIfOpen = (request: Lazy<Promise<T>>, ref: IORef<BreakerState>): TaskEither<Error, T> =>
       fromIO<Error, boolean>(getCurrentTime().read.chain(
         (currentTime) => ref.read.chain(
-          (status) => {
-            switch (status.tag) {
+          (state) => {
+            switch (state.tag) {
               case 'Closed':
-                return ref.write(status).map(constFalse);
+                return ref.write(state).map(constFalse);
               case 'Open': {
-                if (currentTime > status.timeOpened) {
+                if (currentTime > state.openEndTime) {
                   return ref.write(breakerOpen(currentTime + (opts.resetTimeoutSecs * 1000))).map(constTrue);
                 }
-                return ref.write(status).map(constFalse);
+                return ref.write(state).map(constFalse);
               }
             }
           },
@@ -81,11 +71,11 @@ export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<
 
     const breakerService = (
       request: Lazy<Promise<T>>,
-      ref: IORef<BreakerStatus> = new IORef(breakerClosed(0)),
-    ): [IORef<BreakerStatus>, TaskEither<Error, T>] =>
-      [ref, fromIO<Error, BreakerStatus>(ref.read).chain(
-        (status: BreakerStatus) => {
-          switch (status.tag) {
+      ref: IORef<BreakerState> = new IORef(breakerClosed(0)),
+    ): [IORef<BreakerState>, TaskEither<Error, T>] =>
+      [ref, fromIO<Error, BreakerState>(ref.read).chain(
+        (state: BreakerState) => {
+          switch (state.tag) {
             case 'Closed':
               return callIfClosed(request, ref);
             case 'Open':

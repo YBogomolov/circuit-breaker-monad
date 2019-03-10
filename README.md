@@ -7,6 +7,8 @@ Part of [fp-ts](https://github.com/gcanti/fp-ts) ecosystem.
 
 TypeScript implementation of Circuit Breaker pattern. Adaptation of [Glue.CircuitBreaker](https://hackage.haskell.org/package/glue-core-0.4.2/docs/Glue-CircuitBreaker.html) module from Haskell.
 
+You can read a bit more abou the pattern and this implementation [in my article](https://medium.com/@yuriybogomolov/circuit-breaker-in-a-functional-world-9c555c8e9527).
+
 ## Usage example
 
 First of all, you need to install the package:
@@ -62,3 +64,13 @@ Circuit breaker may be configured by passing these parameters to the Reader:
 - `maxBreakerFailures` - how many times the underlying service must fail in the given window before the circuit opens;
 - `resetTimeoutSecs` - the window of time in which the underlying service must fail for the circuit to open, seconds;
 - `breakerDescription` - description that is attached to the failure so as to identify the particular circuit.
+
+Default options are:
+
+```ts
+export const defaultBreakerOptions: BreakerOptions = {
+  maxBreakerFailures: 3,
+  resetTimeoutSecs: 60,
+  breakerDescription: 'Circuit breaker is closed',
+};
+```
