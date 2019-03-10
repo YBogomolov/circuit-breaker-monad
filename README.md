@@ -62,3 +62,13 @@ Circuit breaker may be configured by passing these parameters to the Reader:
 - `maxBreakerFailures` - how many times the underlying service must fail in the given window before the circuit opens;
 - `resetTimeoutSecs` - the window of time in which the underlying service must fail for the circuit to open, seconds;
 - `breakerDescription` - description that is attached to the failure so as to identify the particular circuit.
+
+Default options are:
+
+```ts
+export const defaultBreakerOptions: BreakerOptions = {
+  maxBreakerFailures: 3,
+  resetTimeoutSecs: 60,
+  breakerDescription: 'Circuit breaker is closed',
+};
+```
