@@ -15,7 +15,7 @@ import { BreakerOptions, BreakerState, EnhancedFetch } from './types';
 export const defaultBreakerOptions: BreakerOptions = {
   maxBreakerFailures: 3,
   resetTimeoutSecs: 60,
-  breakerDescription: 'Circuit breaker is closed',
+  breakerDescription: 'Circuit breaker is open',
 };
 
 export const circuitBreaker = <T>() => new Reader<BreakerOptions, EnhancedFetch<T>>(
