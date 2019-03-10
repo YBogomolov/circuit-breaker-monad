@@ -7,6 +7,8 @@ Part of [fp-ts](https://github.com/gcanti/fp-ts) ecosystem.
 
 TypeScript implementation of Circuit Breaker pattern. Adaptation of [Glue.CircuitBreaker](https://hackage.haskell.org/package/glue-core-0.4.2/docs/Glue-CircuitBreaker.html) module from Haskell.
 
+You can read a bit more abou the pattern and this implementation [in my article](https://medium.com/@yuriybogomolov/circuit-breaker-in-a-functional-world-9c555c8e9527).
+
 ## Usage example
 
 First of all, you need to install the package:
