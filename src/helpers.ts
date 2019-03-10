@@ -1,10 +1,6 @@
 import { IORef } from 'fp-ts/lib/IORef';
 
-import {
-  BreakerClosed,
-  BreakerOpen,
-  BreakerStatus,
-} from './types';
+import { BreakerClosed, BreakerOpen } from './types';
 
 /**
  * Creates a new instance of BreakerClosed class
@@ -14,21 +10,9 @@ export const breakerClosed = (errorCount: number) => new BreakerClosed(errorCoun
 
 /**
  * Creates a new instance of BreakerOpen class
- * @param timeOpened Number of breaker openings
+ * @param openEndTime Time when breaker opening ends
  */
-export const breakerOpen = (timeOpened: number) => new BreakerOpen(timeOpened);
-
-/**
- * Checks whether circuit breaker status is open
- * @param status Circuit breaker status
- */
-export const isStatusOpen = (status: BreakerStatus): status is BreakerOpen => status.tag === 'Open';
-
-/**
- * Checks whether circuit breaker status is closed
- * @param status Circuit breaker status
- */
-export const isStatusClosed = (status: BreakerStatus): status is BreakerClosed => status.tag === 'Closed';
+export const breakerOpen = (openEndTime: number) => new BreakerOpen(openEndTime);
 
 /**
  * Gets current time as UTC timestamp
