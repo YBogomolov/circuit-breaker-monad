@@ -8,7 +8,7 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "test": "mocha -r ts-node/register src/**/*.test.ts",
+    "test": "mocha --timeout 5000 -r ts-node/register src/**/*.test.ts",
     "build": "tsc"
   },
   "repository": {
@@ -36,7 +36,7 @@
     "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
     "fetch-mock": "^7.2.5",
-    "fp-ts": "^1.18.2",
+    "fp-ts": "^2.0.0-rc.2",
     "mocha": "^6.1.4",
     "node-fetch": "^2.3.0",
     "ts-node": "^8.2.0",
