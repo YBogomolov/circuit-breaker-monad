@@ -39,7 +39,7 @@
     "fp-ts": "^1.10.0",
     "mocha": "^5.2.0",
     "node-fetch": "^2.3.0",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.2.0",
     "tslint": "^5.11.0",
     "tslint-sonarts": "^1.8.0",
     "typescript": "^3.4.5"
