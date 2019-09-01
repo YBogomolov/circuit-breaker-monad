@@ -2,6 +2,8 @@
 
 import { Lazy } from 'fp-ts/lib/function';
 import { IORef } from 'fp-ts/lib/IORef';
+import { Reader } from 'fp-ts/lib/Reader';
+import { State } from 'fp-ts/lib/State';
 import { TaskEither } from 'fp-ts/lib/TaskEither';
 
 /**
@@ -67,7 +69,19 @@ export class BreakerOpen {
 export type BreakerState = BreakerClosed | BreakerOpen;
 
 /**
- * Enhanced request handler
+ * Breaker environment for State monad
+ *
+ * @export
+ * @interface BreakerEnvironment
+ * @template T Target data type
  */
-export type EnhancedFetch<T> =
-  (request: Lazy<Promise<T>>, ref?: IORef<BreakerState>) => [IORef<BreakerState>, TaskEither<Error, T>];
+export interface BreakerEnvironment<T> {
+  request: Lazy<Promise<T>>;
+  breakerState: IORef<BreakerState>;
+}
+
+/**
+ * Circuit breaker generator type.
+ * It takes options required to instantiate a breaker and returns a State monad of result.
+ */
+export type CircuitBreaker<T> = Reader<BreakerOptions, State<BreakerEnvironment<T>, TaskEither<Error, T>>>;

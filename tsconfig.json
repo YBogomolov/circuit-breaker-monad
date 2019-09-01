@@ -3,12 +3,9 @@
   "compilerOptions": {
     "outDir": "./lib",
     "rootDir": "./src",
-    "baseUrl": "src",
-    
     "module": "commonjs",
     "target": "es5",
     "moduleResolution": "node",
-
     "strict": true,
     "allowJs": false,
     "strictNullChecks": true,
@@ -22,7 +19,6 @@
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     "declaration": true,
-
     "typeRoots": [
       "./src/@types",
     ],
@@ -36,7 +32,6 @@
     "./src/**/*.ts"
   ],
   "exclude": [
-      "node_modules",
-      "**/*.test.ts"
+    "node_modules"
   ]
 }

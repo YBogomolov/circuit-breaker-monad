@@ -139,6 +139,38 @@
     "no-submodule-imports": false,
     "jsx-no-multiline-js": false,
     "interface-name": false,
-    "no-implicit-dependencies": [true, "dev"]
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "case-insensitive",
+        "grouped-imports": true,
+        "groups": [
+          {
+            "name": "react",
+            "match": "^react$",
+            "order": 10
+          },
+          {
+            "name": "relative",
+            "match": "^\\.\\./",
+            "order": 30
+          },
+          {
+            "name": "local",
+            "match": "(^\\./)|(^\\.$)",
+            "order": 40
+          },
+          {
+            "name": "modules",
+            "match": ".*",
+            "order": 20
+          }
+        ]
+      }
+    ]
   }
 }
