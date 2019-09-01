@@ -1,7 +1,8 @@
 import { left } from 'fp-ts/lib/Either';
-import { constFalse, constTrue, Lazy, pipeOp as pipe } from 'fp-ts/lib/function';
+import { constFalse, constTrue, Lazy } from 'fp-ts/lib/function';
 import * as IO from 'fp-ts/lib/IO';
 import { IORef, newIORef } from 'fp-ts/lib/IORef';
+import { pipe } from 'fp-ts/lib/pipeable';
 import { State } from 'fp-ts/lib/State';
 import * as TE from 'fp-ts/lib/TaskEither';
 

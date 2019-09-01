@@ -85,7 +85,7 @@ describe('Circuit Breaker', () => {
     const [result2] = fetcher({ request: () => fetch(ADDRESS), breakerState });
     await result2();
     expect(breakerState.read().tag).to.equal('Open');
-    await delay(1000, task.of(''))();
+    await delay(1000)(task.of(''))();
     const [result] = fetcher({ request: () => fetch(ADDRESS), breakerState });
     const r3 = await result();
 
@@ -112,12 +112,12 @@ describe('Circuit Breaker', () => {
     const resultE2 = await resultTE2();
     expect(fold(nope, yep)(resultE2)).to.equal('nope');
 
-    await delay(1000, task.of(''))();
+    await delay(1000)(task.of(''))();
     const resultTE3 = fetcher(promise);
     const resultE3 = await resultTE3();
     expect(fold<Error, Response, string>((e) => e.message, yep)(resultE3)).to.equal('open');
 
-    await delay(1000, task.of(''))();
+    await delay(1000)(task.of(''))();
     const resultTE4 = fetcher(promise);
     const resultE4 = await resultTE4();
     expect(fold<Error, Response, string>((e) => e.message, yep)(resultE4)).to.equal('yep');
