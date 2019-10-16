@@ -30,12 +30,12 @@ Let's look at the usage example:
 ```ts
 import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
 
-const fetcher = circuitBreaker<Response>().run(defaultBreakerOptions);
+const fetcher = circuitBreaker<Response>()(defaultBreakerOptions);
 
 const main = async () => {
   const promise = () => fetch('http://my-domain.com/my-data.json').then(res => res.json());
   const [ref, result] = fetcher(promise);
-  const response = await result.run();
+  const response = await result();
   response.fold(
     (e: Error) => { ... },
     (myData: TMyJsonData) => { ... }
@@ -51,9 +51,9 @@ The `ref` variable is resulting circuit breaker status, which can be passed to t
 
 ```ts
 const [ref, result] = fetcher(promise);
-const myData1 = await result.run();
+const myData1 = await result();
 const [, result2] = fetcher(promise, ref);
-const myData2 = await result2.run();
+const myData2 = await result2();
 // here `ref` may be 'Open' if the second call to the service has failed
 ```
 
