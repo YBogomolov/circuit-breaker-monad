@@ -31,8 +31,8 @@ Let's look at the usage example:
 import { fold } from 'fp-ts/lib/Either';
 import { IORef } from 'fp-ts/lib/IORef';
 
-import { circuitBreaker, defaultBreakerOptions } from '../src/index';
-import { BreakerClosed } from '../src/types';
+import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
+import { BreakerClosed } from 'circuit-breaker-monad/lib/types';
 
 const fetcher = circuitBreaker<Response>()(defaultBreakerOptions);
 
