@@ -28,18 +28,25 @@ This function returns a `Reader`, which, given the corresponding `BreakerOptions
 Let's look at the usage example:
 
 ```ts
-import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
+import { fold } from 'fp-ts/lib/Either';
+import { IORef } from 'fp-ts/lib/IORef';
+
+import { circuitBreaker, defaultBreakerOptions } from '../src/index';
+import { BreakerClosed } from '../src/types';
 
 const fetcher = circuitBreaker<Response>()(defaultBreakerOptions);
 
 const main = async () => {
-  const promise = () => fetch('http://my-domain.com/my-data.json').then(res => res.json());
-  const [ref, result] = fetcher(promise);
+  const request = () => fetch('http://my-domain.com/my-data.json').then((res) => res.json());
+  const breakerState = new IORef(new BreakerClosed(0)); // initial breaker state
+  const [result, ref] = fetcher({ request, breakerState });
   const response = await result();
-  response.fold(
-    (e: Error) => { ... },
-    (myData: TMyJsonData) => { ... }
-  );
+
+  fold(
+    (e: Error) => { },
+    (myData) => { },
+  )(response);
+
   // ref :: BreakerClosed { errorCount: 0 }
   // result :: TaskEither<Error, Response>
   // response :: Either<Error, Response>
