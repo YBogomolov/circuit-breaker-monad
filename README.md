@@ -28,18 +28,25 @@ This function returns a `Reader`, which, given the corresponding `BreakerOptions
 Let's look at the usage example:
 
 ```ts
-import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
+import { fold } from 'fp-ts/lib/Either';
+import { IORef } from 'fp-ts/lib/IORef';
 
-const fetcher = circuitBreaker<Response>().run(defaultBreakerOptions);
+import { circuitBreaker, defaultBreakerOptions } from 'circuit-breaker-monad/lib';
+import { BreakerClosed } from 'circuit-breaker-monad/lib/types';
+
+const fetcher = circuitBreaker<Response>()(defaultBreakerOptions);
 
 const main = async () => {
-  const promise = () => fetch('http://my-domain.com/my-data.json').then(res => res.json());
-  const [ref, result] = fetcher(promise);
-  const response = await result.run();
-  response.fold(
-    (e: Error) => { ... },
-    (myData: TMyJsonData) => { ... }
-  );
+  const request = () => fetch('http://my-domain.com/my-data.json').then((res) => res.json());
+  const breakerState = new IORef(new BreakerClosed(0)); // initial breaker state
+  const [result, ref] = fetcher({ request, breakerState });
+  const response = await result();
+
+  fold(
+    (e: Error) => { },
+    (myData) => { },
+  )(response);
+
   // ref :: BreakerClosed { errorCount: 0 }
   // result :: TaskEither<Error, Response>
   // response :: Either<Error, Response>
@@ -51,9 +58,9 @@ The `ref` variable is resulting circuit breaker status, which can be passed to t
 
 ```ts
 const [ref, result] = fetcher(promise);
-const myData1 = await result.run();
+const myData1 = await result();
 const [, result2] = fetcher(promise, ref);
-const myData2 = await result2.run();
+const myData2 = await result2();
 // here `ref` may be 'Open' if the second call to the service has failed
 ```
 
