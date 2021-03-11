@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/YBogomolov/circuit-breaker-monad#readme",
   "peerDependencies": {
-    "fp-ts": "^1.18.2"
+    "fp-ts": "^1.18.2 || ^2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
